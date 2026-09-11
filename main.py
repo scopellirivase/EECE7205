@@ -1,6 +1,6 @@
 def main():
-  num1 = 4
-  num2 = 5
+  num1 = 2
+  num2 = 3
   sum = num1 + num2
   print("Sum is ", sum)
 
