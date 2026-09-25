@@ -141,6 +141,7 @@ vector<vector<string>> groupAnagrams(vector<string> words)
   map<string, vector<string>> g = {};
   vector<vector<string>> groups = {};
   vector<string> keys = {};
+
   for (int i = 0; i <= n - 1; i++){
     string key = words[i];
     sort(key.begin(), key.end());
@@ -162,6 +163,11 @@ vector<vector<string>> groupAnagrams(vector<string> words)
 bool checkAvailability(vector<vector<int>> intervals)
 {
   int n = intervals.size();
+
+  if (n <= 1) {
+    return true;
+  }
+
   for (int i = 0; i <= n-2; i++) {
     for (int j = 0; j <= n - i - 2; j++) {
       if (intervals[j][0] > intervals[j + 1][0] || (intervals[j][0] == intervals[j + 1][0] && intervals[j][1] > intervals[j + 1][1])) {
@@ -276,6 +282,9 @@ int kLargestElement (vector<int> A, int k)
         A[j] = A[j + 1];
         A[j + 1] = temp;
       }
+    }
+    if (i == k - 1) {
+      return A[n - k];
     }
   }
   return A[n - k];
