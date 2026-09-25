@@ -1,15 +1,8 @@
 # EECE7205
-Personal repository for the EECE7205 NE class of Fundamentals of Computer Engineering for the Fall 2026 Term.
+Personal repository of Eduardo Scopelli for the EECE7205 NE class of Fundamentals of Computer Engineering for the Fall 2026 Term.
 
-This repository is a simple collection of all exercises made for this course, utilizing C++.
+This repository will include files for all exercises and assignments made for this course, utilizing C++.
 
-# Git commands
-git status
-git add FILENAME
-git config --global user.name USERNAME
-git commit
-
-git remote add origin https://github.com/scopellirivase/EECE7205.git
-git branch -M main
-git push -u origin main
-git pull origin main
+CURRENT FILES - 24-09-26
+- Assignment01_Scopelli.cpp: Main C++ file for Assignment 01, including functions for each of the 10 problems in the assignment, as well as a testCases() function including various test cases per problem and a final message for each after successfully executing each test.
+- SortPractice01.cpp: File including different sorting functions for the first class assignment established, including functions for bubble, insertion and selection sort algorithms.
