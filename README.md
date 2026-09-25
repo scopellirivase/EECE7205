@@ -5,4 +5,5 @@ This repository will include files for all exercises and assignments made for th
 
 CURRENT FILES - 24-09-26
 - Assignment01_Scopelli.cpp: Main C++ file for Assignment 01, including functions for each of the 10 problems in the assignment, as well as a testCases() function including various test cases per problem and a final message for each after successfully executing each test.
+- Assignment01_Scopelli.zip / .pdf: Downloaded report files from Overleaf with the assignment 01 report.
 - SortPractice01.cpp: File including different sorting functions for the first class assignment established, including functions for bubble, insertion and selection sort algorithms.
