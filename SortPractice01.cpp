@@ -32,7 +32,7 @@ vector<int> bubbleSort(vector<int> A)
                 A[j] = A[j + 1];
                 A[j + 1] = temp;
                 swapped = true;
-                //cout << count_s << ": " << printArray(A) << endl;
+                cout << "Pass " << count_s << ": " << printArray(A) << endl;
             }
         }
         if (swapped == false) {
@@ -49,43 +49,128 @@ vector<int> bubbleSort(vector<int> A)
 vector<int> insertionSort(vector<int> A)
 {
     int n = A.size();
+    int count_c = 0;
+    int count_s = 0;
+
     for (int i = 1; i <= n - 1; i++) {
         int key = A[i];
         int j = i - 1;
+        
         while (j >= 0 && A[j] > key)
         {
+            count_c++;
             A[j + 1] = A[j];
             j--;
         }
-        A[j + 1] = key;
+        if (j != i - 1) {
+            A[j + 1] = key;
+            count_s++;
+            cout << "Key: " << key << "; Pass " << count_s << ": " << printArray(A) << endl;
+        }
     }
+
+    cout << "Comparisons: " << count_c << endl;
+    cout << "Swaps: " << count_s << endl;
+
     return A;
 }
 
 vector<int> selectionSort(vector<int> A)
 {
     int n = A.size();
+    int count_c = 0;
+    int count_s = 0;
+
     for (int i = 0; i <= n - 2; i++) {
         int min_i = i;
         for (int j = i; j <= n - 1; j++) {
             if (A[j] < A[min_i]) {
+                count_c++;
                 min_i = j;
             }
         }
         if (i != min_i) {
-            int temp = A[i];
-            A[i] = A[min_i];
-            A[min_i] = temp;
+            int temp = A[min_i];
+            A[min_i] = A[i];
+            A[i] = temp;
+            count_s++;
+            cout << "Min: " << temp << " at index " << min_i << "; Pass " << count_s << ": " << printArray(A) << endl;
         }
     }
+
+    cout << "Comparisons: " << count_c << endl;
+    cout << "Swaps: " << count_s << endl;
+
     return A;
+}
+
+int partition(vector<int>& A, int start, int end)
+{
+    int i = start - 1;
+    int pivot = A[end];
+
+    for (int j = start; j < end; j++) {
+        if (A[j] <= pivot) {
+            i++;
+            int temp = A[j];
+            A[j] = A[i];
+            A[i] = temp;
+        }
+    }
+
+    int temp = A[end];
+    A[end] = A[i + 1];
+    A[i + 1] = temp;
+
+    return i + 1;
+    
+}
+
+void quickSort(vector<int>& A, int start, int end)
+{
+    if (start < end) {
+        int pivot = partition(A, start, end);
+
+        quickSort(A, start, pivot - 1);
+        quickSort(A, pivot + 1, end);
+    }
+}
+
+void selectSortType(int p, vector<int> A)
+{
+    switch (p)
+    {
+    case 1:
+        cout << printArray(A) << endl;
+        cout << printArray(bubbleSort(A)) << endl;
+        break;
+    case 2:
+        cout << printArray(A) << endl;
+        cout << printArray(insertionSort(A)) << endl;
+        break;
+    case 3:
+        cout << printArray(A) << endl;
+        cout << printArray(selectionSort(A)) << endl;
+        break;
+    case 4:
+        cout << printArray(A) << endl;
+        quickSort(A, 0, A.size() - 1);
+        cout << printArray(A) << endl;
+        break;
+    default:
+        break;
+    }
 }
 
 int main()
 {
     vector<int> A = {34, 7, 23, 32, 5, 62, 14, 19};
+    cout << "Sorting Algorithm: ";
+    int n = 0;
+    cin >> n;
+    cout << endl;
 
-    cout << printArray(A) << endl;
-    cout << printArray(bubbleSort(A)) << endl;
-
+    selectSortType(n, A);
+    
+    return 0;
 }
