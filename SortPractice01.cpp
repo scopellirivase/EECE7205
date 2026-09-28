@@ -12,6 +12,26 @@ string printArray(vector<int> A)
     return s;
 }
 
+string printSubArray(vector<int> A, int start, int end)
+{
+    string s = "[ ";
+    for (int i = start; i <= end; i++) {
+        s += to_string(A[i]) + " ";
+    }
+    s += "]";
+    return s;
+}
+
+vector<int> subVector(vector<int> A, int start, int end)
+{
+    vector<int> B = {};
+    for (int i = start; i <= end; i++) {
+        B.push_back(A[i]);
+    }
+
+    return B;
+}
+
 // ============================================
 
 vector<int> bubbleSort(vector<int> A)
@@ -122,6 +142,9 @@ int partition(vector<int>& A, int start, int end)
     A[end] = A[i + 1];
     A[i + 1] = temp;
 
+    cout << "Pivot: " << pivot << "; Start: " << start << "; End: " << end << " - "; 
+    cout << printSubArray(A, start, end) << " - " << printArray(A) << endl;
+
     return i + 1;
     
 }
@@ -134,6 +157,49 @@ void quickSort(vector<int>& A, int start, int end)
         quickSort(A, start, pivot - 1);
         quickSort(A, pivot + 1, end);
     }
+}
+
+void merge(vector<int>& A, int low, int mid, int high)
+{
+    vector<int> L = subVector(A, low, mid);
+    vector<int> R = subVector(A, mid + 1, high);
+
+    int l = 0; int r = 0; int a = low;
+
+    while (l < L.size() && r < R.size()) {
+        if (L[l] < R[r]) {
+            A[a] = L[l];
+            l++; a++;
+        } else {
+            A[a] = R[r];
+            r++; a++;
+        }
+    }
+    while (l < L.size()) {
+        A[a] = L[l];
+        l++; a++;
+    }
+    while (r < R.size()) {
+        A[a] = R[r];
+        r++; a++;
+    }
+}
+
+void mergeSort(vector<int>& A, int low, int high)
+{
+    cout << "Sub-array: " << printSubArray(A, low, high) << " - " << printArray(A) << endl;
+    if (low < high) {
+        int mid = (low + high) / 2;
+        mergeSort(A, low, mid);
+        mergeSort(A,mid + 1, high);
+        merge(A, low, mid, high);
+        cout << "Merged array: " << printSubArray(A, low, high) << " - " << printArray(A) << endl;
+    }
+}
+
+void heapSort(vector<int>& A)
+{
+    
 }
 
 void selectSortType(int p, vector<int> A)
@@ -157,6 +223,11 @@ void selectSortType(int p, vector<int> A)
         quickSort(A, 0, A.size() - 1);
         cout << printArray(A) << endl;
         break;
+    case 5: 
+        cout << printArray(A) << endl;
+        mergeSort(A, 0, A.size() - 1);
+        cout << printArray(A) << endl;
+        break;
     default:
         break;
     }
@@ -165,12 +236,12 @@ void selectSortType(int p, vector<int> A)
 int main()
 {
     vector<int> A = {34, 7, 23, 32, 5, 62, 14, 19};
-    cout << "Sorting Algorithm: ";
+    cout << "Select a Sorting Algorithm: ";
     int n = 0;
     cin >> n;
     cout << endl;
 
     selectSortType(n, A);
-    
+
     return 0;
 }
