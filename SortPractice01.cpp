@@ -1,6 +1,10 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
+#include <chrono>
+#include <locale>
 using namespace std;
+using namespace std::chrono;
 
 string printArray(vector<int> A)
 {
@@ -32,6 +36,17 @@ vector<int> subVector(vector<int> A, int start, int end)
     return B;
 }
 
+vector<int> reverseVector(vector<int> A)
+{
+    int n = A.size();
+    vector<int> R = {};
+
+    for (int i = n - 1; i >= 0; i--) {
+        R.push_back(A[i]);
+    }
+    return R;
+}
+
 // ============================================
 
 vector<int> bubbleSort(vector<int> A)
@@ -42,6 +57,7 @@ vector<int> bubbleSort(vector<int> A)
 
     for (int i = 0; i <= n - 2; i++) {
         bool swapped = false;
+        count_c++;
         for (int j = 0; j <= n - i - 2; j++) {
             count_c++;
             if (A[j] > A[j + 1]) {
@@ -57,10 +73,8 @@ vector<int> bubbleSort(vector<int> A)
             break;
         }
     }
-
     cout << "Comparisons: " << count_c << endl;
     cout << "Swaps: " << count_s << endl;
-    
     return A;
 }
 
@@ -276,15 +290,349 @@ void selectSortType(int p, vector<int> A)
     }
 }
 
+// =====================================================
+
+#pragma region Algorithm Comparison Definitions
+int bubbleSortC(vector<int>& A)
+{
+    int n = A.size();
+    int count_c = 0; // Initialize count of comparisons
+    for (int i = 0; i <= n - 2; i++) {
+        bool swapped = false;
+        count_c++;
+        for (int j = 0; j <= n - i - 2; j++) {
+            count_c++;
+            if (A[j] > A[j + 1]) {
+                int temp = A[j]; // Swap array values using a temporal variable
+                A[j] = A[j + 1];
+                A[j + 1] = temp;
+                swapped = true;
+            }
+        }
+        if (swapped == false) { // No swaps means the array is in order
+            break;
+        }
+    }
+    return count_c;
+}
+
+int insertionSortC(vector<int>& A)
+{
+    int n = A.size();
+    int count_c = 0;
+    for (int i = 1; i <= n - 1; i++) {
+        int key = A[i]; // Define key value for each iteration
+        int j = i - 1;
+        count_c++;
+        while (j >= 0 && A[j] > key)
+        {
+            count_c++;
+            A[j + 1] = A[j]; // Shift larger values to the right
+            j--;
+        }
+        if (j != i - 1) {
+            A[j + 1] = key; // Insert key value into it's final position
+        }
+    }
+    return count_c;
+}
+
+int selectionSortC(vector<int>& A)
+{
+    int n = A.size();
+    int count_c = 0;
+    for (int i = 0; i <= n - 2; i++) {
+        count_c++;
+        int min_i = i;
+        for (int j = i + 1; j <= n - 1; j++) {
+            count_c++;
+            if (A[j] < A[min_i]) {
+                min_i = j;  // Determine index of smallest value
+            }
+        }
+        if (i != min_i) {
+            int temp = A[min_i];    // Swaps smallest value to beginning of the array
+            A[min_i] = A[i];
+            A[i] = temp;
+        }
+    }
+    return count_c;
+}
+
+int partitionC(vector<int>& A, int start, int end, int& count_c)
+{
+    int i = start - 1;
+    int pivot = A[end]; // Pivot selected at the end of the array
+    for (int j = start; j < end; j++) {
+        count_c++;
+        if (A[j] <= pivot) {
+            i++;        // Determine final position for pivot value
+            int temp = A[j];
+            A[j] = A[i];
+            A[i] = temp;
+        }
+    }
+    int temp = A[end];  // Swap pivot value to it's corresponding position
+    A[end] = A[i + 1];
+    A[i + 1] = temp;
+    return i + 1;
+}
+
+void quickSortC(vector<int>& A, int start, int end, int& count_c)
+{
+    if (start < end) {
+        count_c++;
+        int pivot = partitionC(A, start, end, count_c); // Determine pivot value to split array
+        quickSortC(A, start, pivot - 1, count_c); // Split array along pivot and repeat process
+        quickSortC(A, pivot + 1, end, count_c);
+    }
+}
+
+void mergeC(vector<int>& A, int low, int mid, int high, int& count_c)
+{
+    vector<int> L = subVector(A, low, mid);     // Use helper function to split array
+    vector<int> R = subVector(A, mid + 1, high);
+    int l = 0; int r = 0; int a = low;  // Initialize pointers per array
+    while (l < L.size() && r < R.size()) {  // Merge arrays L and R by smallest values
+        count_c++;
+        if (L[l] < R[r]) {
+            A[a] = L[l];
+            l++; a++;
+        } else {
+            A[a] = R[r];
+            r++; a++;
+        }
+    }
+    while (l < L.size()) {  // Add remaining values in arrays L / R
+        count_c++;
+        A[a] = L[l];
+        l++; a++;
+    }
+    while (r < R.size()) {
+        count_c++;
+        A[a] = R[r];
+        r++; a++;
+    }
+}
+
+void mergeSortC(vector<int>& A, int low, int high, int& count_c)
+{
+    if (low < high) {
+        count_c++;
+        int mid = (low + high) / 2;
+        mergeSortC(A, low, mid, count_c);     // Split input array into two
+        mergeSortC(A,mid + 1, high, count_c);
+        mergeC(A, low, mid, high, count_c);   // Merge split arrays
+    }
+}
+
+void heapifyC(vector<int>& A, int n, int i, int& count_c)
+{
+    int max = i;    // Index values for a parent - children pair in a binary tree
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+    if (left < n && A[left] > A[max]) {
+        max = left;
+    }
+    if (right < n && A[right] > A[max]) {
+        max = right;
+    }
+    if (max != i) {     // Move largest element to parent position (max heap constraint)
+        int temp = A[i];
+        A[i] = A[max];
+        A[max] = temp;
+
+        heapify(A, n, max); // Move down binary tree
+        count_c++;
+    }
+}
+
+void heapSortC(vector<int>& A, int& count_c){
+    int n = A.size();
+    for (int i = n / 2 - 1; i >= 0; i--) {  // Create initial max-heap
+        count_c++;
+        heapifyC(A, n, i, count_c);
+    }
+    for (int i = n - 1; i > 0; i--) {
+        count_c++;
+        int temp = A[0];    // Move largest value to the end
+        A[0] = A[i];
+        A[i] = temp;
+        heapifyC(A, i, 0, count_c);
+    }
+}
+
+#pragma endregion
+
+#pragma region Algorithm Comparison Execution
+void compareAlgorithms(vector<int> A, int p, bool T)
+{
+    // Counting number of comparisons
+    vector<int> A_O1(A);                    // Copy of original array
+    bubbleSortC(A);
+    vector<int> A_S1(A);                    // Copy of sorted array
+    vector<int> A_R1(reverseVector(A_O1));  // Copy of reversed array
+    vector<int> A_RS1(reverseVector(A_S1)); // Copy of reversed sorted array
+
+    int c_O; int c_S; int c_R; int c_RS;    // Initialize counters per type of array
+    string algo;    // Algorithm name
+    auto start = high_resolution_clock::now();
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start); // Define variables for timing
+
+    switch (p)
+    {
+    case 1: // Bubble Sort Algorithm
+        algo = "Bubble Sort";
+        start = high_resolution_clock::now();
+        c_O = bubbleSortC(A_O1);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = bubbleSortC(A_S1);
+            c_R = bubbleSortC(A_R1);
+            c_RS = bubbleSortC(A_RS1);
+        }
+        break;
+    case 2: // Insertion Sort Algorithm
+        algo = "Insertion Sort";
+        start = high_resolution_clock::now();
+        c_O = insertionSortC(A_O1);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = insertionSortC(A_S1);
+            c_R = insertionSortC(A_R1);
+            c_RS = insertionSortC(A_RS1);
+        }
+        break;
+    case 3: // Selection Sort Algorithm
+        algo = "Selection Sort";
+        start = high_resolution_clock::now();
+        c_O = selectionSortC(A_O1);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = selectionSortC(A_S1);
+            c_R = selectionSortC(A_R1);
+            c_RS = selectionSortC(A_RS1);
+        }
+        break;
+    case 4: // Quick Sort Algorithm
+        algo = "Quick Sort";
+        start = high_resolution_clock::now();
+        c_O = 0;
+        quickSortC(A_O1, 0, A_O1.size() - 1, c_O);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = 0;
+            quickSortC(A_S1, 0, A_S1.size() - 1, c_S);
+            c_R = 0;
+            quickSortC(A_R1, 0, A_R1.size() - 1, c_R);
+            c_RS = 0;
+            quickSortC(A_RS1, 0, A_RS1.size() - 1, c_RS);
+        }
+        break;
+    case 5: // Merge Sort Algorithm
+        algo = "Merge Sort";
+        start = high_resolution_clock::now();
+        c_O = 0;
+        mergeSortC(A_O1, 0, A_O1.size() - 1, c_O);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = 0;
+            mergeSortC(A_S1, 0, A_S1.size() - 1, c_S);
+            c_R = 0;
+            mergeSortC(A_R1, 0, A_R1.size() - 1, c_R);
+            c_RS = 0;
+            mergeSortC(A_RS1, 0, A_RS1.size() - 1, c_RS);
+        }
+        break;
+    case 6: // Heap Sort Algorithm
+        algo = "Heap Sort";
+        start = high_resolution_clock::now();
+        c_O = 0;
+        heapSortC(A_O1, c_O);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        if (T) {
+            c_S = 0;
+            heapSortC(A_S1, c_S);
+            c_R = 0;
+            heapSortC(A_R1, c_R);
+            c_RS = 0;
+            heapSortC(A_RS1, c_RS);
+        }
+        break;
+    default:
+        break;
+    }
+    if (T) {
+        cout << left << setw(20) << algo << left << setw(10) << c_O << left << setw(8) << c_S << left << setw(10) << c_R << left << setw(17) << c_RS << endl;
+    } else {
+        cout.imbue(locale(cout.getloc()));
+        cout << left << setw(16) << algo << " - " << left << setw(7) << duration.count() << left << setw(6) << " us - " << left << printSubArray(A_O1,0,10) << endl;
+    }
+}
+
+void timeAnalysis()
+{
+    vector<int> A1(1000);
+    for (int i = 0; i < 1000; i++) {
+        A1[i] = rand() % 100000;
+    }
+    vector<int> A2(5000);
+    for (int i = 0; i < 5000; i++) {
+        A2[i] = rand() % 100000;
+    }
+    vector<int> A3(10000);
+    for (int i = 0; i < 10000; i++) {
+        A3[i] = rand() % 100000;
+    }
+
+    cout << "Time analysis (1000 elements): " << endl;
+    for (int i = 1; i <= 6; i++) {
+        compareAlgorithms(A1, i, false);
+    }
+    cout << endl;
+
+    cout << "Time analysis (5000 elements): " << endl;
+    for (int i = 1; i <= 6; i++) {
+        compareAlgorithms(A2, i, false);
+    }
+    cout << endl;
+
+    cout << "Time analysis (10000 elements): " << endl;
+    for (int i = 1; i <= 6; i++) {
+        compareAlgorithms(A3, i, false);
+    }
+    cout << endl;
+}
+#pragma endregion
+
 int main()
 {
     vector<int> A = {34, 7, 23, 32, 5, 62, 14, 19};
-    cout << "Select a Sorting Algorithm: ";
+    
+    // Code for running functions for problems 1 - 6:
+    /*cout << "Select a Sorting Algorithm: ";
     int n = 0;
     cin >> n;
     cout << endl;
 
-    selectSortType(n, A);
+    selectSortType(n, A); */
+    
+    // Code for counting and printing the number of iterations / comparisons completed for each algorithm using the base array A: 
+    cout << left << setw(20) << "Algorithm" << left << setw(10) << "Original" << left << setw(8) << "Sorted" << left << setw(10) << "Reversed" << left << setw(17) << "Reversed Sorted" << endl;
+    for (int i = 1; i <= 6; i++) {
+        compareAlgorithms(A, i, true);
+    }
+    cout << endl;
+
+    // Function for executing each algorithm with 1000, 5000 and 10000 element arrays and counting execution time
+    timeAnalysis();
 
     return 0;
 }
