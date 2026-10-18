@@ -132,6 +132,10 @@ void case_2(Node* node, int leaf) {
     delete cur;
 }
 
+void case_3(Node* node, int target) {
+    return;
+}
+
 #pragma endregion
 
 // ======================== Main Execution ========================
