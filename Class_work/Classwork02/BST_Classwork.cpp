@@ -130,10 +130,151 @@ void case_2(Node* node, int leaf) {
     if (parent->left == cur) parent->left = nullptr;
     else parent->right = nullptr;
     delete cur;
-}
+};
 
 void case_3(Node* node, int target) {
-    return;
+    // Case 3: delete a node with ONE child.
+    // 1. search for the target, remembering its parent
+    Node* parent = nullptr;
+    Node* cur = node;
+    int key = target;
+    while (cur != nullptr && cur->data != key) {
+        parent = cur;
+        if (key < cur->data) cur = cur->left;
+        else cur = cur->right;
+    }
+    // 2. its only child takes its place
+    Node* child = (cur->left != nullptr) ? cur->left : cur->right;
+    if (parent->left == cur) parent->left = child;
+    else parent->right = child;
+    delete cur;
+}
+
+void case_4(Node* node, int target) {
+    // Case 4: delete a node with TWO children (20).
+    // 1. search for target
+    Node* cur = node;
+    int key = target;
+    while (cur != nullptr && cur->data != key) {
+        if (key < cur->data) cur = cur->left;
+        else cur = cur->right;
+    }
+    
+    // 2. find the inorder successor: right once, then left as far as possible
+    Node* parent = cur;
+    Node* succ = cur->right; // 30
+    while (succ->left != nullptr) {
+        parent = succ;
+        succ = succ->left;
+    }
+    
+    // 3. copy the successor's value into the node
+    cur->data = succ->data;
+
+    // 4. remove the successor node (it has no left child)
+    if (parent == cur)
+        parent->right = succ->right;
+    else
+        parent->left = succ->right;
+    delete succ;
+}
+
+void case_5(Node* node, int target) {
+    // Case 5: the key is not in the tree.
+    Node* cur = node;
+    int key = target;
+    while (cur != nullptr && cur->data != key) {
+        if (key < cur->data) cur = cur->left;
+        else cur = cur->right;
+    }
+    if (cur == nullptr)
+        cout << key << " is not in the tree: nothing to delete" << endl;
+}
+
+void case_5_3(Node* node, int target) {
+    // Case 5: the key is not in the tree.
+    if (!node) {
+        cout << "Tree is empty" << endl;
+        return;
+    }
+    Node* parent = nullptr;
+    Node* cur = node;
+    int key = target;
+    while (cur != nullptr && cur->data != key) {
+        parent = cur;
+        if (key < cur->data) cur = cur->left;
+        else cur = cur->right;
+    }
+    if (cur == nullptr)
+        if (parent->data > target) {
+            parent->left = new Node(target);
+        } else {
+            parent->right = new Node(target);
+        }
+}
+
+void deleteNode(Node* node, int target) {
+    Node* curr = node;
+    Node* prev = nullptr;
+
+    // Step 1: Search for the target node
+    while (curr != nullptr && curr->data != target) {
+        prev = curr;
+        if (target < curr->data) {
+            curr = curr->left;
+        } else {
+            curr = curr->right;
+        }
+    }
+
+    // Key not found in the tree (Case 5)
+    if (curr == nullptr) {
+        if (prev->data > target) {
+            prev->left = new Node(target);
+        } else {
+            prev->right = new Node(target);
+        }
+        return;
+    }
+
+    // Leaf or single child node (Case 2-3)
+    if (curr->left == nullptr || curr->right == nullptr) {
+        // Find the non-null child (or nullptr if it's a leaf node)
+        Node* newChild = (curr->left != nullptr) ? curr->left : curr->right;
+
+        // If the node to delete is the root node
+        if (prev == nullptr) {
+            delete curr;
+            node = newChild;
+            return;
+        }
+
+        if (curr == prev->left) {
+            prev->left = newChild;
+        } else {
+            prev->right = newChild;
+        }
+        delete curr;
+    } 
+    // Two children (Case 1 - 4)
+    else {
+        Node* succParent = curr;
+        Node* succ = curr->right;
+        while (succ->left != nullptr) {
+            succParent = succ;
+            succ = succ->left;
+        }
+
+        curr->data = succ->data;
+
+        if (succParent->left == succ) {
+            succParent->left = succ->right;
+        } else {
+            succParent->right = succ->right;
+        }
+        
+        delete succ;
+    }
 }
 
 #pragma endregion
@@ -154,6 +295,7 @@ Node* treeSelection(int i) {
         // Binary Search Tree P
         inorder = {15, 25, 30, 35, 45, 55, 60, 65, 75};
         preorder = {45, 25, 15, 35, 30, 65, 55, 60, 75};
+        break;
     default:
         break;
     }
@@ -161,7 +303,7 @@ Node* treeSelection(int i) {
     TreeBuilder builder;
     Node* root = builder.createTree(inorder, preorder);
 
-    printInorder(root); cout << endl;
+    cout << "Generated tree: "; printInorder(root); cout << endl;
     
     return root;
 }
@@ -170,14 +312,34 @@ void caseSelection(Node* root, int i, int target) {
     switch (i)
     {
     case 1:
-        printInorder(root); cout << endl;
+        cout << "Before: "; printInorder(root); cout << endl;
         case_1(root);
-        printInorder(root); cout << endl;
+        cout << "After:  "; printInorder(root); cout << endl;
         break;
     case 2:
-        printInorder(root); cout << endl;
+        cout << "Before: "; printInorder(root); cout << endl;
         case_2(root, target);
-        printInorder(root); cout << endl;
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 3:
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_3(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 4:
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_4(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 5:
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_5_3(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 6:
+        cout << "Before: "; printInorder(root); cout << endl;
+        deleteNode(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
         break;
     default:
         break;
@@ -190,13 +352,16 @@ void caseSelection(Node* root, int i, int target) {
 int main() {
     int tree;
     int cnum;
-    cout << "Tree selection (T: 1, P:2): ";
+    int target;
+    cout << "Tree selection (T: 1, P: 2): ";
     cin >> tree;
-    cout << "Case selection (1 - 5): ";
-    cin >> cnum;
-
-    int target = 10;
     Node* root = treeSelection(tree);
+    
+    cout << "Case selection (Cases: 1 - 5, General deletion: 6): ";
+    cin >> cnum;
+    cout << "Select a target: ";
+    cin >> target;
+
     caseSelection(root, cnum, target);
 
     return 0;
