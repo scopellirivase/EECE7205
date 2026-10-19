@@ -81,15 +81,11 @@ void case_1(Node* node) {
         parent = succ;
         succ = succ->left;
     }
-
     // 2. copy the successor's value into the root
     node->data = succ->data;
-
     // 3. remove the successor node (it has no left child)
-    if (parent == node)
-        parent->right = succ->right;
-    else
-        parent->left = succ->right;
+    if (parent == node) parent->right = succ->right;
+    else parent->left = succ->right;
     delete succ;
 }
 
@@ -102,15 +98,11 @@ void case_1_3(Node* node) {
         parent = pred;
         pred = pred->right;
     }
-
     // 2. copy the successor's value into the root
     node->data = pred->data;
-
     // 3. remove the successor node (it has no left child)
-    if (parent == node)
-        parent->left = pred->left;
-    else
-        parent->right = pred->left;
+    if (parent == node) parent->left = pred->left;
+    else parent->right = pred->left;
     delete pred;
 }
 
@@ -176,6 +168,35 @@ void case_4(Node* node, int target) {
         parent->right = succ->right;
     else
         parent->left = succ->right;
+    delete succ;
+}
+
+void case_4_4(Node* node, int target) {
+    // Case 4: delete a node with TWO children (20).
+    // 1. search for target
+    Node* cur = node;
+    int key = target;
+    while (cur != nullptr && cur->data != key) {
+        if (key < cur->data) cur = cur->left;
+        else cur = cur->right;
+    }
+    
+    // 2. find the inorder predecessor: left once, then right as far as possible
+    Node* parent = cur;
+    Node* succ = cur->left;
+    while (succ->right != nullptr) {
+        parent = succ;
+        succ = succ->right;
+    }
+    
+    // 3. copy the successor's value into the node
+    cur->data = succ->data;
+
+    // 4. remove the successor node (it has no left child)
+    if (parent == cur)
+        parent->left = succ->left;
+    else
+        parent->right = succ->left;
     delete succ;
 }
 
@@ -333,12 +354,27 @@ void caseSelection(Node* root, int i, int target) {
         break;
     case 5:
         cout << "Before: "; printInorder(root); cout << endl;
-        case_5_3(root, target);
+        case_5(root, target);
         cout << "After:  "; printInorder(root); cout << endl;
         break;
-    case 6:
+    case 6: // Bonus question
         cout << "Before: "; printInorder(root); cout << endl;
         deleteNode(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 7: // Case 1 question 3
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_1_3(root);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 8: // Case 4 question 4
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_4_4(root, target);
+        cout << "After:  "; printInorder(root); cout << endl;
+        break;
+    case 9: // Case 5 questions 3-4
+        cout << "Before: "; printInorder(root); cout << endl;
+        case_5_3(root, target);
         cout << "After:  "; printInorder(root); cout << endl;
         break;
     default:
